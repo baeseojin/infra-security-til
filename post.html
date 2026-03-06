@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIL Detail - Infra Security</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --text-main: #c9d1d9;
+      --accent: #58a6ff;
+      --border: #30363d;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .back-btn {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    /* 마크다운 스타일링 (GitHub 테마 스타일) */
+    #content h1, #content h2 { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px; }
+    #content code { background: #2d333b; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+    #content pre code { display: block; padding: 15px; overflow-x: auto; background: #161b22; }
+    #content blockquote { border-left: 4px solid var(--accent); color: #8b949e; padding-left: 15px; margin-left: 0; }
+    #content img { max-width: 100%; border-radius: 8px; }
+    
+    .loading { text-align: center; color: var(--accent); margin-top: 100px; }
+    .error { color: #f85149; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <nav class="nav-header">
+      <a href="javascript:history.back()" class="back-btn">← 뒤로 가기</a>
+      <span id="file-path" style="font-size: 0.8rem; color: #8b949e;"></span>
+    </nav>
+
+    <div id="loading" class="loading">TIL을 불러오는 중...</div>
+    <div id="content"></div>
+  </div>
+
+  <script>
+    async function loadMarkdown() {
+      const contentDiv = document.getElementById('content');
+      const loadingDiv = document.getElementById('loading');
+      const pathSpan = document.getElementById('file-path');
+
+      // 1. URL에서 파일 경로 추출 (?file=Jan/26-01-27.md)
+      const urlParams = new URLSearchParams(window.location.search);
+      const filePath = urlParams.get('file');
+
+      if (!filePath) {
+        contentDiv.innerHTML = "<p class='error'>파일 경로가 지정되지 않았습니다.</p>";
+        loadingDiv.style.display = 'none';
+        return;
+      }
+
+      pathSpan.innerText = filePath;
+
+      try {
+        // 2. 마크다운 파일 읽어오기 (fetch)
+        const response = await fetch(filePath);
+        
+        if (!response.ok) throw new Error("파일을 찾을 수 없습니다.");
+        
+        const markdown = await response.text();
+
+        // 3. Marked.js를 이용해 HTML로 변환
+        contentDiv.innerHTML = marked.parse(markdown);
+        
+        // 4. 코드 하이라이팅 적용
+        hljs.highlightAll();
+        
+        loadingDiv.style.display = 'none';
+      } catch (error) {
+        loadingDiv.style.display = 'none';
+        contentDiv.innerHTML = `<p class='error'>기록을 불러오지 못했습니다: ${error.message}</p>`;
+      }
+    }
+
+    window.onload = loadMarkdown;
+  </script>
+</body>
+</html>
