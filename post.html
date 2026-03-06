@@ -47,15 +47,72 @@
       font-size: 0.9rem;
     }
 
-    /* 마크다운 스타일링 (GitHub 테마 스타일) */
-    #content h1, #content h2 { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px; }
-    #content code { background: #2d333b; padding: 2px 5px; border-radius: 4px; font-family: monospace; }
-    #content pre code { display: block; padding: 15px; overflow-x: auto; background: #161b22; }
-    #content blockquote { border-left: 4px solid var(--accent); color: #8b949e; padding-left: 15px; margin-left: 0; }
-    #content img { max-width: 100%; border-radius: 8px; }
-    
-    .loading { text-align: center; color: var(--accent); margin-top: 100px; }
-    .error { color: #f85149; text-align: center; }
+    #content h1, #content h2 {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-top: 30px;
+    }
+
+    #content code {
+      background: #2d333b;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    #content pre code {
+      display: block;
+      padding: 15px;
+      overflow-x: auto;
+      background: #161b22;
+    }
+
+    #content blockquote {
+      border-left: 4px solid var(--accent);
+      color: #8b949e;
+      padding-left: 15px;
+      margin-left: 0;
+    }
+
+    #content img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    #content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      display: table;
+    }
+
+    #content th,
+    #content td {
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    #content th {
+      background-color: #161b22;
+      font-weight: 600;
+    }
+
+    #content tr:nth-child(even) {
+      background-color: #0f141a;
+    }
+
+    .loading {
+      text-align: center;
+      color: var(--accent);
+      margin-top: 100px;
+    }
+
+    .error {
+      color: #f85149;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -71,12 +128,16 @@
   </div>
 
   <script>
+    marked.setOptions({
+      gfm: true,
+      breaks: true
+    });
+
     async function loadMarkdown() {
       const contentDiv = document.getElementById('content');
       const loadingDiv = document.getElementById('loading');
       const pathSpan = document.getElementById('file-path');
 
-      // 1. URL에서 파일 경로 추출 (?file=Jan/26-01-27.md)
       const urlParams = new URLSearchParams(window.location.search);
       const filePath = urlParams.get('file');
 
@@ -89,19 +150,16 @@
       pathSpan.innerText = filePath;
 
       try {
-        // 2. 마크다운 파일 읽어오기 (fetch)
         const response = await fetch(filePath);
-        
+
         if (!response.ok) throw new Error("파일을 찾을 수 없습니다.");
-        
+
         const markdown = await response.text();
 
-        // 3. Marked.js를 이용해 HTML로 변환
         contentDiv.innerHTML = marked.parse(markdown);
-        
-        // 4. 코드 하이라이팅 적용
+
         hljs.highlightAll();
-        
+
         loadingDiv.style.display = 'none';
       } catch (error) {
         loadingDiv.style.display = 'none';
