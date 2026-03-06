@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>January TIL - Daily Archive</title>
+  <title>March TIL - Daily Archive</title>
   <style>
     :root {
       --bg-color: #0d1117;
@@ -125,45 +125,56 @@
 <body>
 
   <aside class="sidebar">
-    <h2>January TIL</h2>
+    <h2>March TIL</h2>
     <ul class="daily-menu">
-      <li><a href="#day-20">01.20 - Linux Hardening</a></li>
-      <li><a href="#day-12">01.12 - Docker Network</a></li>
-      <li><a href="#day-05">01.05 - Cloud Basic</a></li>
-      </ul>
+      <li><a href="#day-02">03.09 - Linux</a></li>
+      <li><a href="#day-03">03.010 - Linux</a></li>
+    </ul>
   </aside>
 
   <div class="content-area">
-    <a href="index.html" class="back-home">← 메인 페이지로 이동</a>
+    <a href="../index.html" class="back-home">← 메인 페이지로 이동</a>
 
-    <section id="day-20" class="day-section">
-      <h3 class="day-title">01월 20일</h3>
-      <div class="post-card">
-        <h4>Linux 서버 보안 강화 기초</h4>
-        <p>SSH 루트 로그인 제한 및 fail2ban 설정을 통해 무단 접속 시도를 차단하는 실습을 진행했습니다.</p>
-        <span class="tag">Linux</span>
-      </div>
+    <section id="day-09" class="day-section">
+      <h3 class="day-title">03월 09일</h3>
+      <a href="../post.html?file=Mar/26-03-09.md" class="card-link">
+        <div class="post-card">
+          <h4>리눅스</h4>
+          <p>(클릭하여 상세 보기)</p>
+          <span class="tag">Linux</span>
+        </div>
+      </a>
     </section>
 
-    <section id="day-12" class="day-section">
-      <h3 class="day-title">01월 12일</h3>
-      <div class="post-card">
-        <h4>Docker Network 구조의 이해</h4>
-        <p>각 네트워크 모드(Bridge, Host, None)의 보안적 특징과 컨테이너 격리에 대해 학습했습니다.</p>
-        <span class="tag">Docker</span>
-      </div>
+    <section id="day-10" class="day-section">
+      <h3 class="day-title">03월 10일</h3>
+      <a href="../post.html?file=Mar/26-03-10.md" class="card-link">
+        <div class="post-card">
+          <h4>리눅스</h4>
+          <p>(클릭하여 상세 보기)</p>
+          <span class="tag">Linux</span>
+        </div>
+      </a>
     </section>
 
-    <section id="day-05" class="day-section">
-      <h3 class="day-title">01월 05일</h3>
-      <div class="post-card">
-        <h4>클라우드 보안 책임 공유 모델</h4>
-        <p>CSP와 고객 간의 보안 책임 영역이 어디까지인지 명확히 구분하는 법을 공부했습니다.</p>
-        <span class="tag">Cloud</span>
-      </div>
-    </section>
+    </div>
 
-  </div>
-
+  <style>
+    /* 카드를 클릭 가능하게 만들기 위한 추가 스타일 */
+    .card-link {
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+    .post-card {
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .post-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      background-color: rgba(88, 166, 255, 0.02);
+    }
+  </style>
 </body>
+
 </html>
