@@ -3,10 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Infra Security TIL</title>
+  <title>Seojin's Infra Security TIL</title>
+  <style>
+    /* 기본 스타일 설정 */
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --text-main: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --border: #30363d;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 헤더 섹션 */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      color: var(--accent);
+    }
+
+    header p {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* 메인 컨텐츠 레이아웃 */
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* 포스트 카드 스타일 */
+    .post-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+
+    .post-date {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .post-title {
+      font-size: 1.4rem;
+      margin: 0.5rem 0;
+    }
+
+    .post-excerpt {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #238636;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Infra Security TIL</h1>
-  <p>배서진의 인프라/보안 학습 기록</p>
+
+  <header>
+    <h1>🛡️ Infra Security TIL</h1>
+    <p>배서진의 인프라/보안 기술 블로그</p>
+  </header>
+
+  <main>
+    <article class="post-card">
+      <div class="post-date">2026.03.06</div>
+      <h2 class="post-title">AWS VPC 환경에서의 보안 그룹 설정 최적화</h2>
+      <p class="post-excerpt">인바운드 규칙의 최소 권한 원칙(Least Privilege)을 적용하여 인프라 보안을 강화하는 방법을 정리합니다.</p>
+      <span class="tag">Infrastructure</span>
+      <span class="tag">Security</span>
+    </article>
+
+    <article class="post-card">
+      <div class="post-date">2026.03.05</div>
+      <h2 class="post-title">Kubernetes RBAC 기초 개념 정복</h2>
+      <p class="post-excerpt">Role과 ClusterRole의 차이점을 이해하고, 실무에서 실수하기 쉬운 설정들을 살펴봅니다.</p>
+      <span class="tag">K8s</span>
+      <span class="tag">Cloud Native</span>
+    </article>
+  </main>
+
 </body>
 </html>
