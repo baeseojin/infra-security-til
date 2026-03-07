@@ -1,0 +1,479 @@
+확장 권한
+
+초기화 하시오
+
+user01, user02 생성 및 활성화
+
+useradd user01
+useradd user02
+passwd user01
+passwd user02
+
+
+user01 이 cat 명령어를 통해서 /etc/shadow 내용을 볼 수 있도록 설정하시오.
+
+chmod u+s /bin/cat
+
+/ptest/ 디렉토리를 만들고 안에 만들어지는 파일들의 소유그룹이 user02가 되도록 설정하시오.
+
+mkdir -m 777 /ptest
+chown :user02 /ptest
+chmod g+s /ptest
+
+/ptest/dir01안에 만들어지는 파일이나 디렉토리가 만든 파일 생성자나 root만이 삭제할 수 있도록 설정하시오
+
+mkdir /ptest/dir01
+chmod o+t /ptest
+
+
+
+
+=====================================================================
+
+
+cron 실습
+
+매월 1일 새벽 12시 30분에 datefile1에 date 명령어 결과가 이어쓰기로 써지도록
+
+30 0 1 * * date >> datefile1
+
+
+
+1분마다 date명령어를 실행해서 datefile2에 이어쓰기로 써지도록
+
+* * * * * date >> datefile2
+
+
+매년 1월 1일 오후 12시에 date 명령어가 datefile3로 덮어쓰기로 실행되도록
+
+0 12 1 1 * date > datefile3
+
+vagrant 사용자 가 매년 크리스마스 자정에 Merry christmas 메세지를 /tmp 디렉토리의 christmas 파일에 덮어쓰기로 되도록
+
++++++++++++++++++++++++++++++++++++++++++++++
+
+useradd vagrant
+passwd vagrant
+
+1.
+
+crontab -e -u vagrant
+
+0 0 25 12 * echo "Merry christmas" > /tmp/christmas
+
+2.
+
+su - vagrant
+
+crontab -e
+
+0 0 25 12 * echo "Merry christmas" > /tmp/christmas
+
+3.
+
+vi /etc/crontab
+G
+0 0 25 12 *  vagrant  echo "Merry christmas" > /tmp/christmas 
+
+:w /etc/cron.d/christmas
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+1월 1일 11일 21일 오후 3시부터 오후 5시까지 15분 마다 date 명령어가 datefile4에 이어쓰기로 실행되도록 
+
+*/15 15-17 1,11,21 1 * date >> datefile4
+
+
+매주 월요일 목요일 새벽 1시에 재부팅이 되도록 설정
+
+0 1 * * 1,4 reboot
+
+
+===========================================================================
+
+시스템의 유닛 확인
+
+systemctl or systemctl list-units
+
+-a or --all : 모든 유닛
+
+-t or --type : 특정 유닛 지정
+
+시스템 유닛의 활성화 상태 확인
+
+systemctl list-unit-files
+
+활성화(enabled) => 부팅시에 자동으로 실행 되는지에 대한 여부
+
+state
+
+enabled - 부팅시에 실행됨
+disabled - 부팅시에 실행 안됨
+static - 부팅시 실행하지 않고 다른 유닛에 대해서 실행될 수 있도록 준비상태
+masked - 실행되지 않도록 프리징시킴
+
+유닛 제어 서브 커맨드
+
+systemctl sub-command unit
+
+status : 상태확인
+start : 시작
+stop : 종료
+restart : 재시작
+reload : 재설정
+enable : 활성화
+disable : 비활성화
+mask : 마스크 설정
+unmansk : 마스크 해제
+list-dependencies : 종속성(의존성) 확인
+
+특정 서비스를 설치하고 앞으로도 계속해서 해당 서비스를 실행 설정할 때
+
+systemctl start xxxx.service
+systemctl enable xxxx.service
+
+or
+
+systemctl enable xxxx.service --now
+
+
+systemctl 실습
+
+autofs 서비스 상태 확인
+
+yum -y install autofs
+
+systemctl status autofs
+
+autofs 서비스 시작
+
+systemctl start autofs
+systemctl status autofs
+
+autofs 서비스 활성화
+
+systemctl enable autofs
+systemctl status autofs
+
+autofs 서비스 중지
+
+systemctl stop autofs
+systemctl status autofs
+
+autofs 서비스 비활성화
+
+systemctl disable autofs
+systemctl status autofs
+
+autofs 서비스 잠금
+
+systemctl mask autofs
+systemctl status autofs
+
+autofs 서비스 잠금해제
+
+systemctl unmask autofs
+systemctl status autofs
+
+autofs 서비스 시작 후에 pid 확인
+
+systemctl start autofs
+systemctl status autofs
+pid 확인
+
+autofs 서비스 리로드 후 pid 확인
+
+systemctl reload autofs
+systemctl status autofs
+pid 확인 변화 없음
+
+
+autofs 서비스 재시작 후 pid 확인
+
+systemctl restart autofs
+systemctl status autofs
+pid 확인 pid 변경
+
+==========================================================================================
+
+log : 시스템에 일어나는 이벤트 들에 대한 기록
+
+중요한 이유
+- 이슈 발생시에 해당 시간에 일어났었던 일에 파악하기 위한 첫번째 수단
+
+로그가 저장되는 위치 : /var/log
+
+로그를 관장한 서비스 : systemd-journald, rsyslogd 
+
+-> systemd-journald : 로그를 수집하는 역활 (/run/)
+-> rsyslogd : 로그를 저장하는 역활 (/var/)
+
+rsyslog 서비스
+
+/var/log/messages : 대부분의 로그기록(단 인증,메일,반복예약,부팅 그리고 디버그 제외)
+/var/log/secure : 인증에 관련된 로그
+/var/log/maillog : 메일에 관련된 로그
+/var/log/cron : 반복적인 예약에 관련된 로그
+/var/log/boot.log : 부팅에 관련된 로그
+
+facility(기능).priority(우선순위)
+
+facility
+authpriv : 인증
+auth,security : login
+cron : cron,at 과 같은 스케쥴링
+daemon : telnet,ftp 와 같은 데몬서비스
+kern : 커널
+mail : 메일
+local1-8 : 부팅
+lpr : 프린트
+mark : syslog에 의해 만들어지는 날짜유형
+user : 사용자
+
+priority
+
+0:emerg
+1:alert
+2:critical
+3:error
+4:warning
+5:notice
+6:info
+7:debug
+
+rsyslog.conf 설정 변경후 반영
+
+systemctl restart rsyslog.service
+
+실시간 로그 모니터링
+
+tail -f /var/log/로그파일
+
+로그 메세지 발생
+
+logger -p 기능.우선순위  "메세지"
+
+systemd-journald 서비스
+
+journalctl : 확인
+-> 옵션 : 
+	- n 숫자 : 최근 내역에서 숫자 만큼 출력
+	- p 우선순위 : 해당 우선순위 이상으로 출력
+          notice ~ warning : 볼드체로 표기
+          error 이상       : 빨간색으로 표기
+	- f : 실시간으로 모니터링
+	--since yyyy-mm-dd : 해당 날짜부터 현재까지 출력
+	--since yyyy-mm-dd --until yyyy-mm-dd : since 부터 until까지 출력
+
+/run/log/journal  영구저장
+
+영구 저장시 저장 용량 설정
+
+전체 파일시스템 10%을 넘어서면 안됨
+남아 있는 공간의 15%을 넘어서면 안됨.
+
+mv /run/log/journal  /var/log/
+systemctl restart systemd-journald.service
+
+log 실습
+
+rsyslog.conf 파일을 수정해서 cron.err 이상 내용만 /var/log/cron1 파일에 저장되도록 설정하시오.
+
+vim /etc/rsyslog.conf
+
+/cron
+o
+cron.err         /var/log/cron1 
+
+:wq
+
+logger 명령어를 통해서 cron.info => cronlog1 와 cron.crit => cronlog2 의 메세지를 발생시켜서 /var/log/cron 파일과 /var/log/cron1 파일을 확인해보시오.
+
+logger -p cron.info "cronlog1"
+logger -p cron.crit "cronlog2"
+
+tail -2 /var/log/cron
+
+cronlog1
+cronlog2
+
+tail -2 /var/log/cron1
+
+cronlog2
+
+journal 내용을 영구 저장하도록 설정하시오.
+
+mv /run/log/journal /var/log/
+
+systemctl restart systemd-journald
+
+=============================================================
+
+RPM 관련 패키지 정보 확인 명령어
+rpm -q (쿼리)
+      a : 시스템에 설치되어 있는 모든 패키지
+      i : 패키지에 대한 정보
+      c : 패키지의 설정파일들 보여줌
+      d : 패키지의 문서(document)를 보여줌
+      l : 패키지의 모든 파일 보여줌
+      f : 파일이나 디렉토리가 어떠한 패키지로 인해서 파생되었는지 알려줌.
+
+RPM 관련 패키지 설치 및 업데이트
+rpm -Uvh 패키지 파일명
+
+RPM 관련 패키지 삭제 
+rpm -e 패키지명
+
+YUM(DNF) 명령어
+
+yum(dnf) sub명령어
+
+install 패키지명 : 패키지 설치
+remove  패키지명 : 패키지 삭제
+update  패키지명 : 패키지 업데이트
+info    패키지명 : 패키지 정보확인
+list    : repository 의 패키지 리스트 출력
+provies file/dir : 해당 파일이나 디렉토리가 어떠한 패키지로 인해서 파생되었는지 알려줌( = rpm -qf 와 동일한 작용)
+repolist all : repository 점검
+
+groups list : 그룹 패키지 리스트 출력
+groups install 그룹 패키지명 : 그룹 패키지 설치
+groups remove  그룹 패키지명 : 그룹 패키지 삭제
+groups update  그룹 패키지명 : 그룹 패키지 업데이트
+groups info  그룹 패키지명 : 그룹 패키지 정보
+
+localinstall 패키지파일명 : 패키지파일을 yum으로 설치
+
+
+repository 파일 설정(/etc/yum.repos.d/)
+- 확장자가 반드시 .repo 이여만 함.
+
+RockLinux뿐아니라 CentOS 8과 RHEL 8 부터는 "BaseOS", "AppStream" 2개의 저장소를 사용 
+
+저장소를 이 두가지로 분리한 이유
+- 자주 업데이트되는 AppStream패키지들로 인하여 기반이되는 OS플랫폼관련 패키지들에 영향을 받지않고 안정성과 유연성을 때문
+
+- BaseOS 저장소
+
+BaseOS 리포지토리는 운영체제의 기반이 되는 최소한의 기본기능의 코어(핵심, 필수) 패키지들로 구성
+
+즉, 커널 핵심 패키지 그룹으로 하드웨어, 가상머신, 클라우드 인스턴스, 컨테이너에서 실행 가능하도록 하는 패키지들로 구성 
+
+- AppStream(애플리케이션 스트림) 저장소
+
+AppStream은 BaseOS의 패키지외에 어플리케이션, 소프트웨어, 종속성, 데이터베이스과 관련된 패키지들로 구성
+
+즉, Apache웹서버, Cyrus-imapd, Vim 등과 같은 패키지들, 또는 Java, PHP, Python 등과 같은 개발언어 패키지들, 그리고 MariaDB, PostgreSQL 등과 같은 DBMS 패키지들로 구성된다.  AppStream 패키지들은 BaseOS 패키지들보다 훨씬 더 많이 업데이트됨 
+
+- 내용 구성
+
+[ID명]
+name=repo명
+baseurl=http://주소
+        file://경로
+enabled=1/0 (1이면 활성화, 0이면 비활성화)
+gpgcheck=1/0 (1이면 라이센스 키가 있을 경우, 0이면 라이센크 키가 없는 경우)
+gpgkey=file//경로(gpgcheck=1 일 경우에만 작성)
+
+metadata_expire=6h
+-> 메타데이터가 만기되는 시간(초단위)를 지정
+현재 다운로드된 메타데이터의 오래된 시간이 이 시간보다 짧다면  yum은 repository에서 메타데이터를 업데이트 하지 않을 것
+만약 yum이 업데이트정보를 다운로드 하지않는 일이 자주 발생한다면 이 지시자의 값을 낮추어야 함
+
+repository cache 값 재구성
+
+dnf makecache
+
+
+처음 설정으로 스냅샷
+
+DVD 활성화
+
+umount /dev/cdrom
+mkdir /media/cdrom/
+mount /dev/cdrom /media/cdrom/
+lsblk
+
+Repository 설정 
+
+cd /etc/yum.repos.d/
+mkdir backup
+mv rocky* backup/
+
+vim test.repo
+
+[NET_BaseOs]
+name=network-baseos
+baseurl=http://dl.rockylinux.org/$contentdir/$releasever/BaseOS/$basearch/os/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+
+[NET_AppStream]
+name=network-appstream
+baseurl=http://dl.rockylinux.org/$contentdir/$releasever/AppStream/$basearch/os/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+
+
+
+repository cache  값 재구성
+
+dnf makecache
+
+repo 활성화 상태 확인
+
+dnf repolist all
+
+repo 중에서 NET_AppStream repo를 비활성화 시키시오.
+
+vim test.repo
+
+NET_AppStream 의 enabled=0 설정
+
+repo 활성화 상태 확인
+
+dnf repolist all
+
+저장소에 telnet에 대한 패키지가 어떠한 것이 있는지 확인해보시오.
+
+dnf list | grep telnet
+
+telnet 관련 패키지 설치 및 telnet.socket (service 아님) 시작 및 활성화
+
+dnf install telnet*
+
+systemctl enable telnet.socket --now
+
+telnet 패키지의 설정 파일 및 문서(document) 확인
+
+rpm -qd telnet
+rpm -qc telnet
+
+rsyslog.conf 파일이 어떠한 패키지로 인해서 생성된 것인지 확인(2가지 방법)
+
+rpm -qf /etc/rsyslog.conf
+
+dnf provides /etc/rsyslog.conf
+
+위에 패키지의 정보를 확인 (2가지 방법)
+
+rpm -qi rsyslog
+
+dnf info rsyslog
+
+
+그룹 패키지 중에서 패키지명으로 security(영문판)/보안(한글판) 가 들어간 패키지는?
+
+dnf groups list | grep -i security
+
+해당 그룹 패키지는 어떤 패키지들로 구성이 되어 있는가?
+
+dnf groups info "Security Tools"
+
+zsh-xxxxxxxxxxx.rpm 파일을 yum 명령어를 사용해서 설치하시오.
+
+dnf localinstall zsh-xxxxxxxx.rpm
+
+
