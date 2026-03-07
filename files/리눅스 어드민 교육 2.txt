@@ -1,0 +1,462 @@
+﻿초기화로 스냅샷 
+
+모든 사용자 삭제 (userdel -r 사용자명)
+
+
+
+
+
+vagrant 사용자 생성 및 활성화
+
+
+
+vagrant 를 sudo로 사용자 전환 할 수 있도록 설정 후 vagrant로 사용자 전환
+
+
+sudo -i로 root 전환 후 사용자 생성
+
+default 값을 
+home1, /bin/sh 로 설정
+
+
+
+사용자      uid	gid   보조그룹    home	          shell
+user01     1001	1001  1000	/home/user01(-b)  /bin/bash
+
+
+
+user02     2000	1000  10	/home/user2       /bin/bash
+
+
+
+user03     2001	2001  wheel	/home/user3       /bin/bash
+
+
+
+testuser01 2002	1000            /home1/testuser01 /bin/sh
+
+
+
+default 값
+home, /bin/bash 로 변경
+
+
+
+/home1 => /home
+/bin/sh => /bin/bash
+
+user02의 홈디렉토리를 /home/user02로 변경
+
+
+
+user03의 홈디렉토리를 삭제 후에 다시 만들 것
+
+
+
+testuser01의 아이디명을 user04로 변경, 코멘트 user4로 변경, 홈디렉토리 /home/user04로 변경, 쉘을 /bin/bash로 변경 	
+
+
+
+user01, user02, user03 활성화
+
+
+
+
+======================================================================
+
+작업예약
+
+단일성 예약
+
+특정시기에 한번 작업을 수행
+
+atd 라는 서비스를 이용
+
+atd 서비스 와 crond 서비스는 제어할 수 있는 터미널을 지정받지 못함.
+
+출력하는 명령어를 수행하게 되면 화면에 띄울 수가 없음.
+
+출력하는 명령어의 결과를 메일로 보내오거나 리다이렉션을 이용해서 파일로 저장을 해야 함.
+
+at 명령어 사용
+
+at timespec
+at> 프롬프트가 나오면 해당 작업 작성후 엔터
+at> 나오면 ctrl + d <EOF>
+
+at -l or atq : 예약 확인
+at -c 예약번호 : 작업 내용 확인
+atrm 예약번호 : 작업예약 취소
+
+
+timespec 작성 요령
+
+at 시간 날짜 순으로 기입
+
+22년 2월 23일 오전 10시 기준
+
+지금으로부터 2시간 뒤 작업
+
+at now +2hour (분 - min, 시 - hour)
+
+오후 4시 작업
+
+at 16:00 
+at 04:00 PM
+at teatime
+at 16:00 2/23/22 (월,일,년)
+at 16:00 23-02-23
+at 04:00 PM today
+at teatime today
+
+새벽 12시 작업
+
+at 00:00 
+at 12:00 AM
+at midnight
+
+내일 정오 작업
+
+at 12:00 PM 2/24/22
+at noon tomorrow
+	
+/usr/share/doc/at/timespec 참조
+
+at 실습
+
+1.3분 뒤에 ps -ef 명령어를 실행해서 psfile01에 저장되도록 설정
+
+at now +3min
+at> ps -ef > psfile01
+at> crtl+d
+
+2.24년 10월 1일에 date 명령어를 실행해서 메일로 오도록 설정
+
+at 00:00 10/1/24
+at> date
+at> crtl+d
+
+3.오늘 오후 12시에 cal 명령어를 실행해서 메일로 오도록 설정
+
+at 12:00 PM today
+at> cal
+at> crtl+d
+
+4.내일 오후 4시에 ps -ef 명령어를 실행해서 psfile02에 저정하도록 설정
+
+at teatime tomorrow
+
+5.작업 예약을 확인하시오.
+
+at -l
+or
+atq
+
+
+------------------------------------------
+
+반복성 예약
+
+crond 서비스 이용
+
+사용자 cron 과 시스템 cron
+
+사용자 cron
+
+crontab 이라는 명령어를 사용
+
+crontab -e : 작업예약
+crontab -l : 작업예약 목록 확인
+crontab -r : 작업예약 취소(모든 작업 취소)
+crontab 파일명 : 다른 파일에 만들어놓은 작업을 불러올 수 있음.
+
+cron의 timespec 설정법
+
+X      X      X       X         X         command
+분     시     일      월        요일
+(0~59) (0-23) (1-31)  (1-12)    (0-7:0,7 일요일)
+                      (약식월)  (약식요일)
+특수문자
+* : 모두 참
+- : 범위
+/ : 주기
+, : 연속되지 않은 다수
+
+
+
+1월1일 새벽12시 reboot
+
+0 0 1 1 * reboot
+
+12월 15일 오후 3시부터 오후 6시까지 15분마다 date
+
+*/15 15-18 15 12(or Dec) * date
+
+매월 첫번째 월요일 오후 1시 정각에 date 
+
+0 13 1-7 * 1(Mon) date
+
+매분마다 date명령어를 datefile에 기입하시오.(이어쓰기로)
+
+* * * * * date >> datefile
+
+시스템 cron
+
+cron 과 anacron 으로 2가지 종류가 있음.
+
+일반 cron은 시스템이 켜져 있는 동안에만 해당 시간의 작업을 수행
+
+해당 시간에 시스템이 다운되어 있으면 수행하지 않음.
+
+/etc/crontab 파일을 양식지로 사용해서 /etc/cron.d/ 다른 파일 저장으로 등록
+
+기존 사용자 cron과 다른 점 cron 예약시 사용자 계정이 들어감.
+
+anacron은 작업 해당시간에 시스템이 꺼져 있어서 실행하지 못하더라도 시스템이 켜지면 일정시간 대기후에 해당 작업 실행
+
+
+
+1.매년 1월 첫번째 일요일 자정에 재부팅이 되도록 설정
+
+0 0 1-7 1 0 /sbin/reboot
+
+2.매월 오후 1시부터 5시까지 10분마다 date 명령어를 실행해서 datefile01에 이어쓰기로 저장하도록 설정 
+
+*/10 13-17 * * * date >> datefile01
+
+vi 편집기로 test 파일에 다음 내용 설정
+
+vim test
+
+3.매년 3월, 6월, 9월 2번째 화요일 14시 20분에 /etc/passwd 화일의 내용을 userfile에 갱신하도록 설정
+
+20 14 8-14 3,6,9 2 cat /etc/passwd > userfile
+
+4.매주 수~금 오후 5시에 /var/log/secure의 내용 중 오전 8시 정각부터 오후 5시59분까지의 내용을 securefile에 갱신하도록 설정
+
+0 17 * * 3-5 egrep '... .. '0[89]|1[0-7]' /var/log/secure > securefile
+
+:wq
+
+5.3,4번의 작업을 파일로 예약하시오.
+
+crontab test
+
+6.작업 예약을 확인하시오.
+
+crontab -l
+
+7. 3번 작업만 삭제하시오.
+
+crontab -e
+3번 작업 삭제
+:wq
+
+
+8. 모든 작업을 삭제하시오.
+
+crontab -r
+
+=======================================================================
+
+systemd
+
+시스템의 유닛 확인
+
+  
+
+systemctl or systemctl list-units
+
+  
+
+-a or --all : 모든 유닛
+
+  
+
+-t or --type : 특정 유닛 지정
+
+  
+
+시스템 유닛의 활성화 상태 확인
+
+  
+
+systemctl list-unit-files
+
+  
+
+활성화(enabled) => 부팅시에 자동으로 실행 되는지에 대한 여부
+
+  
+
+state
+
+  
+
+enabled - 부팅시에 실행됨
+
+disabled - 부팅시에 실행 안됨
+
+static - 부팅시 실행하지 않고 다른 유닛에 대해서 실행될 수 있도록 준비상태
+
+masked - 실행되지 않도록 프리징시킴
+
+  
+
+유닛 제어 서브 커맨드
+
+  
+
+systemctl sub-command unit
+
+  
+
+status : 상태확인
+
+start : 시작
+
+stop : 종료
+
+restart : 재시작
+
+reload : 재설정
+
+enable : 활성화
+
+disable : 비활성화
+
+mask : 마스크 설정
+
+unmansk : 마스크 해제
+
+list-dependencies : 종속성(의존성) 확인
+
+  
+
+특정 서비스를 설치하고 앞으로도 계속해서 해당 서비스를 실행 설정할 때
+
+  
+
+systemctl start xxxx.service
+
+systemctl enable xxxx.service
+
+  
+
+or
+
+  
+
+systemctl enable xxxx.service --now
+
+  
+
+systemd 실습 1
+
+sshd  서비스  상태  확인
+
+  
+
+systemctl  disable  sshd  --now
+
+  
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  시작
+
+  
+
+systemctl  start  sshd
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  활성화
+
+  
+
+systemctl  enable  sshd
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  중지
+
+  
+
+systemctl  stop  sshd
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  비활성화
+
+  
+
+systemctl  disable  sshd
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  잠금
+
+  
+
+systemctl  mask  sshd
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  잠금해제
+
+  
+
+systemctl  unmask  sshd
+
+systemctl  status  sshd
+
+  
+
+sshd  서비스  시작  후에  pid  확인
+
+  
+
+systemctl  start  sshd
+
+systemctl  status  sshd
+
+pid  확인
+
+  
+
+sshd  서비스  리로드  후  pid  확인
+
+  
+
+systemctl  reload  sshd
+
+systemctl  status  sshd
+
+pid  확인  변화  없음
+
+  
+  
+
+sshd  서비스  재시작  후  pid  확인
+
+  
+
+systemctl  restart  sshd
+
+systemctl  status  sshd
+
+pid  확인  pid  변경
+
